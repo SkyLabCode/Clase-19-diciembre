@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        #map {
+            height: 550px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+
+    <script>
+
+        const api_url = "https://valencia.opendatasoft.com/api/records/1.0/search/?dataset=valenbisi-disponibilitat-valenbisi-dsiponibilidad&rows=273";
+
+        //Generamos el mapa dentro del div con id map, con los datos
+        //de lat, lon y zoom
+        var map = L.map('map').setView([39.47368637693502, -0.3767522049128496], 13);
+
+        //Establece el template o imagen del mapa
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                console.log(latitude, longitude);
+                var marker = L.marker([latitude, longitude]).addTo(map);
+            },
+            (error) => {
+                console.error(error);
+            }
+        );
+
+
+
+        async function getStations() {
+            //Controlamos el proceso mediante try - catch
+            //o manejo de excepciones
+            try {
+                const response = await fetch(api_url);
+                if (!response.ok) {
+                    throw new Error('Error fetching data');
+                }
+
+                const data = await response.json();
+                console.log(data);
+                const stations = data.records;
+
+                //Mostramos las estaciones:
+                var color = '';
+                for (station of stations) {
+                    //Establecemos el color de la estación:
+                    if (station.fields.available == 0) {
+                        color = 'red';
+                    }
+                    else if (station.fields.available > 0 && station.fields.available < 5) {
+                        color = 'yellow';
+                    }
+                    else if (station.fields.available > 5) {
+                        color = 'green';
+                    }
+
+                    //obtenemos la lat y lon de la estación:
+
+                    const lat = station.geometry.coordinates[1];
+                    const lon = station.geometry.coordinates[0];
+
+                    var circle = L.circle([lat, lon], {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.5,
+                        radius: 50
+                    }).addTo(map);
+
+                    circle.bindPopup(
+                        `
+                        <h3>🚲${station.fields.address}🚲</h3>
+                        <p>Última actualización: ${station.fields.updated_at}</p>
+                        <hr>
+                        <ul>
+                            <li>Bicis disponibles: ${station.fields.available}</li>
+                            <li>Huecos libres: ${station.fields.free}</li>
+                            <li>Total puestos: ${station.fields.total}</li>
+                        </ul>
+                        `
+                    );
+
+
+                }
+
+
+
+
+            } catch (error) {
+                //Mostramos en consola el error obtenido por throw
+                console.error(error);
+            }
+
+        }
+
+        getStations();
+
+    </script>
+
+</body>
+
+</html>
