@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imágenes Aleatorias de Perros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        img {
+            margin: 20px auto;
+            max-width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>¡Imágenes Aleatorias de Perros!</h1>
+    <div>
+        <img id="dogImage" src="" alt="Haz clic en el botón para ver una imagen" />
+    </div>
+    <button onclick="obtenerImagen()">Ver otro perro</button>
+
+    <script>
+        async function obtenerImagen() {
+            const apiUrl = "https://dog.ceo/api/breeds/image/random";
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const dogImage = document.getElementById("dogImage");
+                dogImage.src = data.message; // URL de la imagen
+                dogImage.alt = "Imagen de un perro";
+            } catch (error) {
+                console.error("Error al obtener la imagen del perro:", error);
+                alert("No se pudo cargar la imagen. Intenta nuevamente.");
+            }
+        }
+
+        // Cargar una imagen al abrir la página
+        obtenerImagen();
+    </script>
+</body>
+
+</html>

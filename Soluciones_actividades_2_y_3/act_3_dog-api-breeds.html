@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imágenes de Razas de Perros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        img {
+            margin: 20px auto;
+            max-width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>¡Imágenes de Razas de Perros!</h1>
+    <div>
+        <select id="breedSelector">
+            <option value="">Elige una raza</option>
+        </select>
+    </div>
+    <div>
+        <img id="dogImage" src="" alt="Selecciona una raza para ver una imagen" />
+    </div>
+    <button onclick="obtenerImagen()">Ver imagen</button>
+
+    <script>
+        async function cargarRazas() {
+            const apiUrl = "https://dog.ceo/api/breeds/list/all";
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const breeds = Object.keys(data.message);
+                const breedSelector = document.getElementById("breedSelector");
+
+                // Rellenar el selector con las razas
+                breeds.forEach(breed => {
+                    const option = document.createElement("option");
+                    option.value = breed;
+                    option.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
+                    breedSelector.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar las razas:", error);
+                alert("No se pudieron cargar las razas. Intenta nuevamente.");
+            }
+        }
+
+        async function obtenerImagen() {
+            const breedSelector = document.getElementById("breedSelector");
+            const breed = breedSelector.value;
+
+            if (!breed) {
+                alert("Por favor, selecciona una raza primero.");
+                return;
+            }
+
+            const apiUrl = `https://dog.ceo/api/breed/${breed}/images/random`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const dogImage = document.getElementById("dogImage");
+                dogImage.src = data.message; // URL de la imagen
+                dogImage.alt = `Imagen de un ${breed}`;
+
+            } catch (error) {
+                console.error("Error al obtener la imagen del perro:", error);
+                alert("No se pudo cargar la imagen. Intenta nuevamente.");
+            }
+        }
+
+        // Cargar las razas al iniciar la página
+        cargarRazas();
+    </script>
+</body>
+
+</html>

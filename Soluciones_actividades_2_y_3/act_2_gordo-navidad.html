@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probabilidad de Ganar en la Lotería</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        input, button {
+            margin: 10px;
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Probabilidad de Ganar en la Lotería de Navidad</h1>
+    <p>Introduce la cantidad de boletos que juegas:</p>
+    <input type="number" id="boletos" min="1" placeholder="Número de boletos">
+    <button onclick="calcularProbabilidades()">Calcular Probabilidades</button>
+
+    <h2>Resultados</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo de Premio</th>
+                <th>Cantidad de Premios</th>
+                <th>Probabilidad</th>
+                <th>Porcentaje</th>
+            </tr>
+        </thead>
+        <tbody id="resultado"></tbody>
+    </table>
+
+    <script>
+        // objeto con la lista de premios y su cantidad
+        const premios = [
+            { nombre: "Primer Premio (El Gordo)", cantidad: 1 },
+            { nombre: "Segundo Premio", cantidad: 1 },
+            { nombre: "Tercer Premio", cantidad: 1 },
+            { nombre: "Cuartos Premios", cantidad: 2 },
+            { nombre: "Quintos Premios", cantidad: 8 },
+            { nombre: "Pedrea (Premios menores)", cantidad: 1794 }
+        ];
+
+        const totalBoletos = 100000; // Total de números en la lotería
+
+        function calcularProbabilidades() {
+            const boletosJugados = parseInt(document.getElementById("boletos").value);
+            
+            if (boletosJugados < 1) {
+                alert("Por favor, introduce una cantidad válida de boletos.");
+                return;
+            }
+
+            const tablaResultados = document.getElementById("resultado");
+            tablaResultados.innerHTML = ""; // Limpiar resultados anteriores
+
+            premios.forEach(premio => {
+                // Calcular probabilidad
+                const probabilidad = (boletosJugados * premio.cantidad) / totalBoletos;
+                const porcentaje = probabilidad * 100;
+
+                // Agregar fila a la tabla
+                const fila = `
+                    <tr>
+                        <td>${premio.nombre}</td>
+                        <td>${premio.cantidad}</td>
+                        <td>${probabilidad.toFixed(8)}</td>
+                        <td>${porcentaje.toFixed(6)}%</td>
+                    </tr>
+                `;
+                tablaResultados.innerHTML += fila;
+            });
+        }
+    </script>
+</body>
+</html>
